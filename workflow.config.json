@@ -1,0 +1,80 @@
+{
+  "workflow_description": {
+    "name": "crispr_analysis",
+    "version": 1.0,
+    "label": "CRISPR analysis",
+    "type": "crispr_analysis",
+    "inputs": "raw_fastq/{sample}*fastq.gz",
+    "outputs": [
+      "DE_genes_edgeR/*",
+      "final_report.html"
+    ],
+    "report_index": "final_report.html",
+    "reports":[
+       "final_report.html"
+    ]
+  },
+  "general_params": [
+    "library_name",
+    "sample_name",
+    "lib_forward_read_length",
+    "lib_reverse_read_length"
+  ],
+  "gui_params": {
+    "primary": {},
+    "detailed": {
+      "adapter": {
+        "label": "Trim adapters",
+        "type": "string",
+        "default": "GGAAAGGACGAAACACCG"
+      },
+      "crispr_type": {
+        "label": "CRISPR type",
+        "type": "string",
+        "default": "CRISPR_Brunello"
+      },
+      "conditions_to_compare": {
+        "label": "Conditions to compare",
+        "type": "string",
+        "default": "D0_WT:D0_dA5,D0_WT:D22_dA5,D0_WT:D7_dA5,D22_WT:D22_dA5,D7_WT:D7_dA5,D0_dA5:D22_dA5,D0_dA5:D7_dA5,D0_WT:D22_WT,D0_WT:D7_WT"
+      },
+      "error_rate": {
+        "label": "Allowed error rate of adapters",
+        "type": "string",
+        "default": "0.2"
+      },
+      "min_overlap": {
+        "label": "Minimal overlap of adapters",
+        "type": "int",
+        "default": 18
+      },
+      "min_len": {
+        "label": "Discard length of sequences",
+        "type": "int",
+        "default": 20
+      },
+      "times": {
+        "label": "Maximal number of adapters to remove",
+        "type": "int",
+        "default": 1
+      },
+      "guide_len": {
+        "label": "Remaining length of the guide sequence",
+        "type": "int",
+        "default": 20
+      },
+      "top_genes": {
+        "label": "Top genes to be shown in resulting graphs.pdf from DE part",
+        "type": "int",
+        "default": 10
+      },
+      "samples": {
+        "condition": {
+          "label": "Condition",
+          "type": "string",
+          "default": ""
+        }
+      }
+    }
+  }
+}

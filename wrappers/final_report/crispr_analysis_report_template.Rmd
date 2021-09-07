@@ -1,0 +1,100 @@
+---
+title:  "CRISPR analysis report"
+#author: "Martin Demko"
+#date:   "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: no
+      smooth_scroll: yes
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### *Project: `r snakemake@params$pname`*
+#### *Date: `r format(Sys.time(), '%d %B, %Y')`*
+
+<!--
+A Way how to use config in Rmd file (assuming we have cfg in params in snakemake rule):
+`r rjson::fromJSON(snakemake@params$cfg)$macs_padj_filter[1]`
+-->
+
+## Description
+
+CRISPR analysis pipeline is based on ...
+
+## Pipeline steps
+
+* Step 1: ...
+
+* Step 2: ...
+
+## Pipeline outputs
+
+Pipeline directory content description (only important files/folders are described). The pipeline starts with the raw fastq files ...
+
+Pipeline was executed with [this configuration](./`r snakemake@params$pname`.crispr_analysis.config.json)
+
+* `cleaned_fastq` (folder) - contains files with preprocessed sequences.
+    * `*_clean_SE.fastq.gz` (compressed file) - is a clean fastq file as a result of trimming process by [Cutadapt tool](https://cutadapt.readthedocs.io/en/stable/).
+    * `*.inserts.fa` (file) - contains unique inserts (`r snakemake@params$guide_len`nt long pieces of reads). This is input for following alignment process.
+    * `*.inserts.counts` (file) - contains abundance of unique inserts in original fastq file.
+
+* `cleaned_fastq_qc` (folder) - contains QC data of clean fastq files as a result of [FastQC tool](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+```{r echo = FALSE, results = "asis"}
+path = "/cleaned_fastq_qc"
+for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+
+* `hsblastn` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src)
+```{r echo = FALSE, results = "asis"}
+path = "/hsblastn"
+for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recursive=T)){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+
+* `hsblastn_filter` (folder) - contains summarised alignment results.
+  * [all_samples_statistics.tsv](./hsblastn_filter/all_samples_statistics.tsv) (file) - summary table from alignment
+  * [all_samples_report.tsv](./hsblastn_filter/all_samples_report.tsv) (file) - raw counts for sample data against reference guide sequences
+  * [all_samples_report.pdf](./hsblastn_filter/all_samples_report.pdf) (file) - report summarising alignment data with various statistics
+  * `*_graphs.pdf` (file) - shows inserts histograms:
+```{r echo = FALSE, results = "asis"}
+path = "/hsblastn_filter"
+for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+
+* `DE_genes_edgeR` (folder) - contains results of differential expression
+  * `*.gene_summary.tsv` (file) - result of DE on gene level:
+```{r echo = FALSE, results = "asis"}
+path = "/DE_genes_edgeR"
+for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+  * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
+```{r echo = FALSE, results = "asis"}
+path = "/DE_genes_edgeR"
+for (i in list.files(paste0(snakemake@params$wdir, path), "sgRNAs_summary.tsv", recursive=T)){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+  * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
+```{r echo = FALSE, results = "asis"}
+path = "/DE_genes_edgeR"
+for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
+  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+}
+```
+
+* [`final_report.html`](./final_report.html) (file) - this report.
