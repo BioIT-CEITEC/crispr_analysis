@@ -21,22 +21,33 @@
     "lib_reverse_read_length"
   ],
   "gui_params": {
-    "primary": {},
-    "detailed": {
-      "adapter": {
-        "label": "Trim adapters",
-        "type": "string",
-        "default": "GGAAAGGACGAAACACCG"
+    "primary": {
+      "reference": {
+        "label": "Genomic Reference",
+        "type": "enum",
+        "default": "GRCh38-p10",
+        "list": ##INCLUDE:reference_info/reference.json##
       },
       "crispr_type": {
         "label": "CRISPR type",
+        "type": "enum",
+        "default": "CRISPR_Brunello",
+        "list": {
+          "CRISPR_Brunello": "CRISPR_Brunello",
+          "CRISPR_GeCKO": "CRISPR_GeCKO"
+        }
+      }
+    },
+    "detailed": {
+      "adapter": {
+        "label": "CRISPR adapter",
         "type": "string",
-        "default": "CRISPR_Brunello"
+        "default": "GGAAAGGACGAAACACCG"
       },
       "conditions_to_compare": {
         "label": "Conditions to compare",
         "type": "string",
-        "default": "D0_WT:D0_dA5,D0_WT:D22_dA5,D0_WT:D7_dA5,D22_WT:D22_dA5,D7_WT:D7_dA5,D0_dA5:D22_dA5,D0_dA5:D7_dA5,D0_WT:D22_WT,D0_WT:D7_WT"
+        "default": "all"
       },
       "error_rate": {
         "label": "Allowed error rate of adapters",
@@ -54,26 +65,31 @@
         "default": 20
       },
       "times": {
-        "label": "Maximal number of adapters to remove",
+        "label": "How many times adapter should be removed",
         "type": "int",
         "default": 1
       },
       "guide_len": {
-        "label": "Remaining length of the guide sequence",
+        "label": "Remaining length of the guide (sgRNA) sequence",
         "type": "int",
         "default": 20
       },
       "top_genes": {
-        "label": "Top genes to be shown in resulting graphs.pdf from DE part",
+        "label": "How many top genes should be reported individually in final plots",
         "type": "int",
         "default": 10
+      }
+    },
+    "samples": {
+      "condition": {
+        "label": "Condition",
+        "type": "string",
+        "default": ""
       },
-      "samples": {
-        "condition": {
-          "label": "Condition",
-          "type": "string",
-          "default": ""
-        }
+      "tag": {
+        "label": "Tag",
+        "type": "string",
+        "default": ""
       }
     }
   }
