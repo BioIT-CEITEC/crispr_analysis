@@ -15,7 +15,7 @@ f = open(log_filename, 'at')
 f.write("## VERSION: cutadapt "+version+"\n")
 f.close()
 
-command = "mkdir -p $(dirname " + snakemake.output.R1 + ") >> " + snakemake.log.run + " 2>&1"
+command = "mkdir -p $(dirname " + snakemake.output.R1 + ") >> " + log_filename + " 2>&1"
 f = open(log_filename, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()

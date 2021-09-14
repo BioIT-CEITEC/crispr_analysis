@@ -6,7 +6,7 @@ from snakemake.utils import min_version
 
 min_version("5.18.0")
 
-GLOBAL_REF_PATH = "/mnt/references/"
+GLOBAL_REF_PATH = "/mnt/references"
 
 # Reference processing
 #
@@ -28,7 +28,7 @@ config["organism"] = [organism_name.lower().replace(" ","_") for organism_name i
 ##### Config processing #####
 # Folders
 #
-reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
+
 
 # Samples
 #
