@@ -3,7 +3,7 @@ library(Biostrings)
 library(parallel)
 
 
-final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,counts,output_dir,cores,sample_name){
+final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,counts,output_dir,cores,sample_name,stat_file){
   # sample_name <- strsplit(alignment_counts, "trimmed_20bpInserts")[[1]][1]
   
   # CONTINUE HERE - FILTERING ALIGNMENT AND SECOND ROUND OPTIMAL ALIGNMENT PROCESSING
@@ -197,7 +197,7 @@ final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,cou
                      `original number of unique inserts` = length(unique_inserts$gene_id),
                      `number of targeted inserts` = length(insert_counts$gene_id),
                      `number of not targeted inserts` = length(unique_inserts$gene_id) - length(insert_counts$gene_id))
-  fwrite(stat,paste0(output_dir,sample_name,"statistics.tsv"),sep = "\t",row.names = F,quote = F)
+  fwrite(stat,stat_file,sep = "\t",row.names = F,quote = F)
   
   Sys.time() - a
 }
@@ -220,6 +220,7 @@ counts <- args[4]
 output_dir <- args[5]
 cores <- args[6]
 sample <- args[7]
+stat_file <- args[8]
 
 if (!dir.exists(output_dir)){
   dir.create(output_dir)
@@ -231,6 +232,7 @@ print(counts)
 print(output_dir)
 print(cores)
 print(sample)
+print(stat_file)
 
 final_blast_counts(insert_files,
                    alignment_counts,
@@ -238,4 +240,5 @@ final_blast_counts(insert_files,
                    counts,
                    output_dir,
                    cores,
-                   sample)
+                   sample,
+                   stat_file)

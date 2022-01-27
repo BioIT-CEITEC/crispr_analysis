@@ -25,7 +25,7 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"(time Rscript {snakemake.params.script} {snakemake.input.idx} {snakemake.input.tsv} {snakemake.input.fa} {snakemake.input.counts} {snakemake.params.odir} {str(snakemake.threads)} {snakemake.params.sample}) >> {log_file} 2>&1"
+command = f"(time Rscript {snakemake.params.script} {snakemake.input.idx} {snakemake.input.tsv} {snakemake.input.fa} {snakemake.input.counts} {snakemake.params.odir} {str(snakemake.threads)} {snakemake.params.sample} {snakemake.output.stats}) >> {log_file} 2>&1"
 f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()

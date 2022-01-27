@@ -119,7 +119,7 @@ rule resolve_dups:
     
 
 rule merge_hs_blast:
-    input:  stats = set(expand("mapped/{sample}_clean_SE.stats.tsv", sample = sample_tab.sample_name)),
+    input:  stats = set(expand("mapped/{sample}.stats.tsv", sample = sample_tab.sample_name)),
     output: table = "mapped/all_samples.stats.tsv",
     log:    "logs/merge_hs_blast.log",
     # conda:  "../wrappers/merge_hs_blast/env.yaml"
@@ -127,11 +127,11 @@ rule merge_hs_blast:
     
 
 rule hs_blast_filter:
-    input:  tsv = "mapped/{sample}_clean_SE.hsblastn.tsv",
-            fa  = "preprocessed_data/{sample}_clean_SE.inserts.fa",
-            counts = "preprocessed_data/{sample}_clean_SE.inserts.counts",
+    input:  tsv = "mapped/{sample}.hsblastn.tsv",
+            fa  = "preprocessed_data/{sample}.inserts.fa",
+            counts = "preprocessed_data/{sample}.inserts.counts",
             idx = expand("{ref_dir}/{ref}.uniq_revcomp_ins.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
-    output: stats = "mapped/{sample}_clean_SE.stats.tsv",
+    output: stats = "mapped/{sample}.stats.tsv",
             uct   = "counts/{sample}_unique_inserts_tab_counts.tsv",
     log:    "logs/{sample}/hs_blast_filter.log",
     threads:    10
@@ -143,14 +143,13 @@ rule hs_blast_filter:
     
 
 rule hs_blast_alignment:
-    input:  ins = "preprocessed_data/{sample}_clean_SE.inserts.seqs",
+    input:  ins = "preprocessed_data/{sample}.inserts.seqs",
             idx = expand("{ref_dir}/index/{ref}.uniq_revcomp_ins.fa", ref_dir=reference_directory, ref=config["crispr_type"])[0],
-    output: out = "mapped/{sample}_clean_SE.hsblastn.tsv",
-            fa  = "preprocessed_data/{sample}_clean_SE.inserts.fa",
-            counts = "preprocessed_data/{sample}_clean_SE.inserts.counts",
+    output: out = "mapped/{sample}.hsblastn.tsv",
+            fa  = "preprocessed_data/{sample}.inserts.fa",
+            counts = "preprocessed_data/{sample}.inserts.counts",
     log:    "logs/{sample}/hs_blast_alignment.log",
     threads: 20,
-    params: sample = "{sample}",
     conda:  "../wrappers/hs_blast_alignment/env.yaml"
     script: "../wrappers/hs_blast_alignment/script.py"
 
@@ -158,11 +157,9 @@ rule hs_blast_alignment:
 rule preprocess_SE:
     input:  R1 = expand("raw_fastq/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
     output: R1 = expand("preprocessed_data/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
-    # input:  R1 = "raw_fastq/{sample}_SE.fastq.gz",
-    # output: R1 = "preprocessed_data/{sample}_clean_SE.fastq.gz",
-            seqs = "preprocessed_data/{sample}_clean_SE.seqs",
-            inserts = "preprocessed_data/{sample}_clean_SE.inserts.seqs",
-            html = "preprocessed_data/{sample}_clean_SE.fastqc.html"
+            seqs = "preprocessed_data/{sample}.seqs",
+            inserts = "preprocessed_data/{sample}.inserts.seqs",
+            html = "preprocessed_data/{sample}.fastqc.html"
     log:    "logs/{sample}/preprocess_SE.log",
     threads:    10
     resources:  mem = 10
@@ -173,8 +170,8 @@ rule preprocess_SE:
             min_len = config["min_len"],
             guide_len = config["guide_len"],
             prefix = "preprocessed_data/",
-            qc_html_R1 = "preprocessed_data/{sample}_clean_SE.fastqc.html",
-            qc_html_R1_tmp = "preprocessed_data/{sample}_clean_SE_fastqc.html",
+            qc_html_R1 = "preprocessed_data/{sample}.fastqc.html",
+            qc_html_R1_tmp = "preprocessed_data/{sample}_fastqc.html",
     conda:  "../wrappers/preprocess_SE/env.yaml"
     script: "../wrappers/preprocess_SE/script.py"
 
