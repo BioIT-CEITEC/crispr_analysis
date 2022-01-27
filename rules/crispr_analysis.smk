@@ -45,8 +45,8 @@ rule final_report:
             ref = config.crispr_type,
             top = config.top_genes,
             cfg = json.dumps(config),
-    conda:  "../wrappers/final_report/env.yaml"   
-    script: "../wrappers/final_report/crispr_analysis_report_template.Rmd"   
+    conda:  "../wrappers/final_report/env.yaml"
+    script: "../wrappers/final_report/crispr_analysis_report_template.Rmd"
     
 
 rule DE_genes_edgeR:
