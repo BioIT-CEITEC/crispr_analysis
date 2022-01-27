@@ -17,7 +17,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#### *Project: `r snakemake@cfg.entity_name`*
+#### *Project: `r snakemake@params$name`*
 #### *Date: `r format(Sys.time(), '%d %B, %Y')`*
 
 <!--
