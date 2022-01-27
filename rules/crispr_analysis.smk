@@ -156,10 +156,10 @@ rule hs_blast_alignment:
 
 
 rule preprocess_SE:
-    # input:  R1 = expand("raw_fastq/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
-    # output: R1 = expand("preprocessed_data/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
-    input:  R1 = "raw_fastq/{sample}_SE.fastq.gz",
-    output: R1 = "preprocessed_data/{sample}_clean_SE.fastq.gz",
+    input:  R1 = expand("raw_fastq/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
+    output: R1 = expand("preprocessed_data/{{sample}}{read_pair_tags}.fastq.gz",read_pair_tags = read_pair_tags),
+    # input:  R1 = "raw_fastq/{sample}_SE.fastq.gz",
+    # output: R1 = "preprocessed_data/{sample}_clean_SE.fastq.gz",
             seqs = "preprocessed_data/{sample}_clean_SE.seqs",
             inserts = "preprocessed_data/{sample}_clean_SE.inserts.seqs",
             html = "preprocessed_data/{sample}_clean_SE.fastqc.html"
