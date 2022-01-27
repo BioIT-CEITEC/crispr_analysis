@@ -31,9 +31,13 @@ final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,cou
   # blast_counts[to_remove,to_remove := V5 != min(V5),by = V1]
   # blast_counts <- unique(blast_counts[!to_remove,],by = "V1")
   
-  unique_duplicated_counts_tab <- duplicated_counts_tab[,.SD[which(V3 == max(V3) & V4 == max(V4) & V5 == min(V5))],by = V1]
-  unique_duplicated_counts_tab <- unique_duplicated_counts_tab[!duplicated(unique_duplicated_counts_tab$V1)] 
-  best_alignments_with_duplicates <- rbind(unique_counts_tab,unique_duplicated_counts_tab) 
+  if(duplicated_counts_tab[,.N] > 0) {
+    unique_duplicated_counts_tab <- duplicated_counts_tab[,.SD[which(V3 == max(V3) & V4 == max(V4) & V5 == min(V5))],by = V1]
+    unique_duplicated_counts_tab <- unique_duplicated_counts_tab[!duplicated(unique_duplicated_counts_tab$V1)] 
+    best_alignments_with_duplicates <- rbind(unique_counts_tab,unique_duplicated_counts_tab) 
+  } else {
+    best_alignments_with_duplicates = unique_counts_tab
+  }
   setorder(best_alignments_with_duplicates,V1) 
   
   #keep only the hits with alignment longer then 17 nt
@@ -100,26 +104,41 @@ final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,cou
   #this need to be filtered according the scores and laignment lengths
   #only the best hits from each read are taken
   
-  optimal_alignment_of_not_mapped <- unlist(mclapply(not_mapped_by_blast_with_counts[N>=10]$seq,function(target) {
-    which.max(pairwiseAlignment(pattern = unique_inserts$seq, subject = target,substitutionMatrix = sm,gapOpening = -0.1, gapExtension = -1,type = "local",scoreOnly = T))
-  },mc.cores = cores))
-  
-  res <- pairwiseAlignment(pattern = unique_inserts$seq[optimal_alignment_of_not_mapped],subject = not_mapped_by_blast_with_counts[N>=10]$seq,substitutionMatrix = sm,gapOpening = -0.1, 
-  gapExtension = -1,type = "local" )
-  
-  #res@pattern@range@width
-  #res@score
-  #get only those alignment whose score and alignment length are at least 18
-  #keep the new alignments, these numbers follow the order as in unique inserts table
-  #unique_inserts[optimal_alignment_of_not_mapped[res@pattern@range@width >= 17 & res@score >= 14]]
-  #keep the same order from not mapped reads
-  #not_mapped_by_blast_with_counts[N>=10][res@pattern@range@width >= 17 & res@score >= 14]
-  
-  optimal_aln_resolved_not_mapped <- cbind(unique_inserts[optimal_alignment_of_not_mapped[res@pattern@range@width >= 17 & res@score >= 14],c(1,2,4)],not_mapped_by_blast_with_counts[N>=10][res@pattern@range@width >= 17 & res@score >= 14])
-  summed_optimal_aln_resolved_not_mapped <- optimal_aln_resolved_not_mapped[,list(N = sum(N) ), by = c("merge_id")]
-  setnames(summed_optimal_aln_resolved_not_mapped,"merge_id","V2")
-  
-  final_blast_tab_counts <- rbind(final_tab_for_counting[,c(4,3)],summed_optimal_aln_resolved_not_mapped)
+  if(not_mapped_by_blast_with_counts[N>=10,.N] > 0) {
+    optimal_alignment_of_not_mapped <- unlist(mclapply(not_mapped_by_blast_with_counts[N>=10]$seq,function(target) {
+      which.max(pairwiseAlignment(pattern = unique_inserts$seq, 
+                                  subject = target, 
+                                  substitutionMatrix = sm, 
+                                  gapOpening = -0.1, 
+                                  gapExtension = -1, 
+                                  type = "local", 
+                                  scoreOnly = T))
+    },mc.cores = cores))
+    
+    res <- pairwiseAlignment(pattern = unique_inserts$seq[optimal_alignment_of_not_mapped],
+                             subject = not_mapped_by_blast_with_counts[N>=10]$seq,
+                             substitutionMatrix = sm,
+                             gapOpening = -0.1, 
+                             gapExtension = -1,
+                             type = "local" )
+    
+    #res@pattern@range@width
+    #res@score
+    #get only those alignment whose score and alignment length are at least 18
+    #keep the new alignments, these numbers follow the order as in unique inserts table
+    #unique_inserts[optimal_alignment_of_not_mapped[res@pattern@range@width >= 17 & res@score >= 14]]
+    #keep the same order from not mapped reads
+    #not_mapped_by_blast_with_counts[N>=10][res@pattern@range@width >= 17 & res@score >= 14]
+    
+    optimal_aln_resolved_not_mapped <- cbind(unique_inserts[optimal_alignment_of_not_mapped[res@pattern@range@width >= 17 & res@score >= 14],c(1,2,4)],
+                                             not_mapped_by_blast_with_counts[N>=10][res@pattern@range@width >= 17 & res@score >= 14])
+    summed_optimal_aln_resolved_not_mapped <- optimal_aln_resolved_not_mapped[,list(N = sum(N) ), by = c("merge_id")]
+    setnames(summed_optimal_aln_resolved_not_mapped,"merge_id","V2")
+    
+    final_blast_tab_counts <- rbind(final_tab_for_counting[,c(4,3)],summed_optimal_aln_resolved_not_mapped)
+  } else {
+    final_blast_tab_counts = final_tab_for_counting[,c(4,3)]
+  }
   final_blast_tab_counts <- final_blast_tab_counts[,list(N = sum(N) ), by = "V2"]
   setnames(final_blast_tab_counts,"V2","merge_id")
   
@@ -134,13 +153,14 @@ final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,cou
   ############################################################################
   #final rest of unmapped reads
   
-  
-  final_not_mapped_by_blast_reads <- insert_reads_tab[!seq %in% c(final_tab_for_counting$seq,optimal_aln_resolved_not_mapped$seq)]
-  
-  final_not_mapped_by_blast_reads_counts <- merge(final_not_mapped_by_blast_reads[,2],merged_inserts_reads_seqs_counts,by="seq")
+  final_not_mapped_by_blast_reads <- insert_reads_tab[!seq %in% final_tab_for_counting$seq]
+  if(not_mapped_by_blast_with_counts[N>=10,.N] > 0) {
+    final_not_mapped_by_blast_reads <- final_not_mapped_by_blast_reads[!seq %in% optimal_aln_resolved_not_mapped$seq]
+  }
+  final_not_mapped_by_blast_reads_counts <- merge(final_not_mapped_by_blast_reads[,.(seq)],merged_inserts_reads_seqs_counts,by="seq")
   
   final_not_mapped_by_blast_reads_counts400 <- final_not_mapped_by_blast_reads_counts[N>=400]
-  if (dim(final_not_mapped_by_blast_reads_counts400)[1] >=1){
+  if (final_not_mapped_by_blast_reads_counts400[,.N] > 0){
     setorder(final_not_mapped_by_blast_reads_counts400,-N)
     fa = character(2 * nrow(final_not_mapped_by_blast_reads_counts400))
     fa[c(TRUE, FALSE)] = sprintf(">%s", seq(1,length(final_not_mapped_by_blast_reads_counts400$seq)),1)
@@ -164,9 +184,9 @@ final_blast_counts <- function(insert_files,alignment_counts,all_fasta_reads,cou
   #GRAPHS
   pdf(file = paste0(output_dir,sample_name,"graphs.pdf"))
   hist(final_not_mapped_by_blast_reads_counts$N,breaks = 200,ylim = c(0,1000),main = "non-insert sequences histogram",xlab = "read count of sequence")
-  hist(insert_counts[N > 0,]$N,breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
-  hist(insert_counts[N > 0 & N < 1000,]$N,breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
-  hist(insert_counts[N > 0 & N < 200,]$N,breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
+  hist(insert_counts[N > 0, N],breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
+  hist(insert_counts[N > 0 & N < 1000, N],breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
+  hist(insert_counts[N > 0 & N < 200, N],breaks = 300,main = "inserts histogram",xlab = "read count of inserts")
   dev.off()
   
   

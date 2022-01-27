@@ -7,6 +7,10 @@
     "inputs": "raw_fastq/{sample}*fastq.gz",
     "outputs": [
       "DE_genes_edgeR/*",
+      "cleaned_fastq/*",
+      "cleaned_fastq_qc/*",
+      "hsblastn/*",
+      "hsblastn_filter/*",
       "final_report.html"
     ],
     "report_index": "final_report.html",

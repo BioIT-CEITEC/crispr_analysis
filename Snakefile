@@ -1,12 +1,17 @@
 import os
 import pandas as pd
+import itertools
 import json
+from snakemake.utils import R
+from snakemake.utils import report
+from os.path import split
 from snakemake.utils import min_version
 
 
 min_version("5.18.0")
 
 GLOBAL_REF_PATH = "/mnt/references"
+GLOBAL_TMPD_PATH = "/tmp/"
 
 # Reference processing
 #
@@ -16,6 +21,27 @@ if not "adaptors" in config:
 
 if not "full_name_rep" in config:
     config["full_name_rep"] = "no.rep.to.join"
+
+if not "crispr_type" in config:
+    config['crispr_type'] = 'CRISPR_Brunello'
+if not "adapter" in config:
+    config['adapter'] = "GGAAAGGACGAAACACCG"
+if not 'error_rate' in config:
+    config['error_rate'] = '0.2'    # Allowed error rate of adapters
+if not 'min_overlap' in config:
+    config['min_overlap'] = 18   # Minimal overlap of adapters
+if not 'times' in config:
+    config['times'] = 1     # Maximal number of adapters to remove
+if not 'min_len' in config:
+    config['min_len'] = 20  # Discard length of sequences
+if not 'guide_len' in config:
+    config['guide_len'] = 20    # Remaining length of the guide sequence
+if not 'conditions_to_compare' in config:
+    config['conditions_to_compare'] = 'all'
+if not 'top_genes' in config:
+    config['top_genes'] = 10    # Top genes to be shown in resulting graphs.pdf from DE part
+if not 'use_tag_to_pair_samples' in config:
+    config['use_tag_to_pair_samples'] = True
 
 
 # setting organism from reference
@@ -28,11 +54,13 @@ config["organism"] = [organism_name.lower().replace(" ","_") for organism_name i
 ##### Config processing #####
 # Folders
 #
-
+# reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
+reference_directory = os.path.join(GLOBAL_REF_PATH, "general", config["crispr_type"])
 
 # Samples
 #
 sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+print(sample_tab)
 
 if config["lib_reverse_read_length"] == 0:
     read_pair_tags = [""]
