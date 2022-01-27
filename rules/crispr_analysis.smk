@@ -57,7 +57,7 @@ rule DE_genes_edgeR:
             sg   = "DE_results/{cond}/{cond}.sgRNAs_summary.tsv",
             pdf  = "DE_results/{cond}/{cond}.graphs.pdf",
     log:    "DE_results/{cond}/{cond}.DE_genes_edgeR.log",
-    params: script = workflow.basedir+"/../wrappers/DE_genes_edgeR/DE_genes_CRISPR_edgeR.R",
+    params: script = workflow.basedir+"/wrappers/DE_genes_edgeR/DE_genes_CRISPR_edgeR.R",
             odir = "DE_results/{cond}/",
             design = "DE_results/{cond}/{cond}.design_table.tsv",
             gene = "DE_results/{cond}/gene_summary.tsv",
@@ -103,7 +103,7 @@ rule report_counts:
     output: pdf = "counts/all_samples_report.pdf",
             tsv = "counts/all_samples_report.tsv",
     log:    "logs/report_counts.log",
-    params: script = workflow.basedir+"/../wrappers/report_counts/counts_stat_CRISPR.R",
+    params: script = workflow.basedir+"/wrappers/report_counts/counts_stat_CRISPR.R",
             prefix = "counts/all_samples_report",
     conda:  "../wrappers/report_counts/env.yaml"
     script: "../wrappers/report_counts/script.py"
@@ -113,7 +113,7 @@ rule resolve_dups:
     input:  counts = "counts/{sample}_unique_inserts_tab_counts.tsv",
     output: table = "counts/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv",
     log:    "logs/{sample}/resolve_dups.log",
-    params: script = workflow.basedir+"/../wrappers/resolve_dups/resolve_count_duplicates.py",
+    params: script = workflow.basedir+"/wrappers/resolve_dups/resolve_count_duplicates.py",
     conda:  "../wrappers/resolve_dups/env.yaml"
     script: "../wrappers/resolve_dups/script.py"
     
@@ -137,7 +137,7 @@ rule hs_blast_filter:
     threads:    10
     params: odir = "counts/",
             sample = "{sample}_",
-            script = workflow.basedir+"/../wrappers/hs_blast_filter/filter_hsblastn_counts.R",
+            script = workflow.basedir+"/wrappers/hs_blast_filter/filter_hsblastn_counts.R",
     conda:  "../wrappers/hs_blast_filter/env.yaml"
     script: "../wrappers/hs_blast_filter/script.py"
     
