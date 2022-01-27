@@ -14,13 +14,13 @@ from os.path import split
 
 def DE_conditions(wildcards):
     inputs = []
-    if 'conditions_to_compare' in config and config.conditions_to_compare != "":
-        if config.conditions_to_compare == "all":
+    if 'conditions_to_compare' in config and config["conditions_to_compare"] != "":
+        if config["conditions_to_compare"] == "all":
             # create all pairs of conditions
             conditions = itertools.permutations(set(sample_tab.condition),2)
         else:
             # use only specified conditions
-            conditions = [x.split(":") for x in config.conditions_to_compare.split(",")]
+            conditions = [x.split(":") for x in config["conditions_to_compare"].split(",")]
             
         for cond in conditions:
             if len(cond) > 2:
@@ -43,8 +43,8 @@ rule final_report:
     params: wdir = "./",
             name = config["task_name"],
             guide_len = config["guide_len"],
-            ref = config.crispr_type,
-            top = config.top_genes,
+            ref = config["crispr_type"],
+            top = config["top_genes"],
             cfg = json.dumps(config),
     conda:  "../wrappers/final_report/env.yaml"
     script: "../wrappers/final_report/crispr_analysis_report_template.Rmd"
@@ -63,8 +63,8 @@ rule DE_genes_edgeR:
             gene = "DE_results/{cond}/gene_summary.tsv",
             sg   = "DE_results/{cond}/sgRNAs_summary.tsv",
             pdf  = "DE_results/{cond}/graphs.pdf",
-            top  = config.top_genes,
-            paired = config.use_tag_to_pair_samples,
+            top  = config["top_genes"],
+            paired = config["use_tag_to_pair_samples"],
     conda:  "../wrappers/DE_genes_edgeR/env.yaml"
     script: "../wrappers/DE_genes_edgeR/script.py"
 
@@ -166,12 +166,12 @@ rule preprocess_SE:
     log:    "logs/{sample}/preprocess_SE.log",
     threads:    10
     resources:  mem = 10
-    params: adapter = config.adapter,
-            error_rate = config.error_rate,
-            min_overlap = config.min_overlap,
-            times = config.times,
-            min_len = config.min_len,
-            guide_len = config.guide_len,
+    params: adapter = config["adapter"],
+            error_rate = config["error_rate"],
+            min_overlap = config["min_overlap"],
+            times = config["times"],
+            min_len = config["min_len"],
+            guide_len = config["guide_len"],
             prefix = "preprocessed_data/",
             qc_html_R1 = "preprocessed_data/{sample}_clean_SE.fastqc.html",
             qc_html_R1_tmp = "preprocessed_data/{sample}_clean_SE_fastqc.html",
