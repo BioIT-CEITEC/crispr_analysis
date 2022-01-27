@@ -41,7 +41,7 @@ rule final_report:
             DEs = DE_conditions,
     output: report = "final_report.html",
     params: wdir = "./",
-            name = config.task_name,
+            name = config["task_name"],
             guide_len = config["guide_len"],
             ref = config.crispr_type,
             top = config.top_genes,
