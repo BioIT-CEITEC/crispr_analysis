@@ -6,11 +6,10 @@
     "type": "crispr_analysis",
     "inputs": "raw_fastq/{sample}*fastq.gz",
     "outputs": [
-      "DE_genes_edgeR/*",
-      "cleaned_fastq/*",
-      "cleaned_fastq_qc/*",
-      "hsblastn/*",
-      "hsblastn_filter/*",
+      "DE_results/*",
+      "preprocessed_data/*",
+      "mapped/*",
+      "counts/*",
       "final_report.html"
     ],
     "report_index": "final_report.html",

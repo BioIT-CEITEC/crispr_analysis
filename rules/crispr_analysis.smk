@@ -98,7 +98,7 @@ rule DE_genes_edgeR:
 #     script: "../wrappers/fastq2bam_RNA/check_contamination/script.py"
 
 rule report_counts:
-    input:  table = set(expand("counts/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv", sample = sample_tab.sample_name)),
+    input:  table = set(expand("counts/{sample}/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv", sample = sample_tab.sample_name)),
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
     output: pdf = "counts/all_samples_report.pdf",
             tsv = "counts/all_samples_report.tsv",
@@ -110,8 +110,8 @@ rule report_counts:
     
     
 rule resolve_dups:
-    input:  counts = "counts/{sample}_unique_inserts_tab_counts.tsv",
-    output: table = "counts/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv",
+    input:  counts = "counts/{sample}/{sample}_unique_inserts_tab_counts.tsv",
+    output: table = "counts/{sample}/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv",
     log:    "logs/{sample}/resolve_dups.log",
     params: script = workflow.basedir+"/wrappers/resolve_dups/resolve_count_duplicates.py",
     conda:  "../wrappers/resolve_dups/env.yaml"
@@ -132,10 +132,10 @@ rule hs_blast_filter:
             counts = "preprocessed_data/{sample}.inserts.counts",
             idx = expand("{ref_dir}/{ref}.uniq_revcomp_ins.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
     output: stats = "mapped/{sample}.stats.tsv",
-            uct   = "counts/{sample}_unique_inserts_tab_counts.tsv",
+            uct   = "counts/{sample}/{sample}_unique_inserts_tab_counts.tsv",
     log:    "logs/{sample}/hs_blast_filter.log",
     threads:    10
-    params: odir = "counts/",
+    params: odir = "counts/{sample}/",
             sample = "{sample}_",
             script = workflow.basedir+"/wrappers/hs_blast_filter/filter_hsblastn_counts.R",
     conda:  "../wrappers/hs_blast_filter/env.yaml"

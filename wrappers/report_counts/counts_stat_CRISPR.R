@@ -1,21 +1,18 @@
 library(data.table)
 library(gplots)
 
-# setwd("/mnt/ssd/ssd_1/snakemake/")
-# args <- c("stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/all_samples_report",
+# setwd("/mnt/ssd/ssd_1/sequia/220127__crispr_analysis__Brunello_Haspin__2056/")
+# args <- c("counts/all_samples_report",
 #           "/mnt/ssd/ssd_3/references/general/CRISPR_Brunello/CRISPR_Brunello_mod.csv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D22_WT_rep2/D22_WT_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D7_dA5_rep2/D7_dA5_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D7_WT_rep2/D7_WT_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D0_WT_rep1/D0_WT_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D0_dA5_rep1/D0_dA5_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D22_dA5_rep1/D22_dA5_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D0_WT_rep2/D0_WT_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D22_WT_rep1/D22_WT_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D22_dA5_rep2/D22_dA5_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D7_dA5_rep1/D7_dA5_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D7_WT_rep1/D7_WT_rep1_unique_inserts_tab_counts_resolved_duplicates.tsv",
-#           "stage372_CRISPR_test/CRISPR_general_analysis/hsblastn_filter/D0_dA5_rep2/D0_dA5_rep2_unique_inserts_tab_counts_resolved_duplicates.tsv")
+#           "counts/II_1464_d14_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_1464_d7_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_DMSO_d14_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_1668_d7_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_1668_d14_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/II_DMSO_d14_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/II_1668_d14_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_DMSO_d7_unique_inserts_tab_counts_resolved_duplicates.tsv",
+#           "counts/I_1464_d14_unique_inserts_tab_counts_resolved_duplicates.tsv")
 
 args = commandArgs(trailingOnly=TRUE)
 
