@@ -62,10 +62,17 @@ reference_directory = os.path.join(GLOBAL_REF_PATH, "general", config["crispr_ty
 sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
 print(sample_tab)
 
-if config["lib_reverse_read_length"] == 0:
+if not config["is_paired"]:
     read_pair_tags = [""]
+    paired = "SE"
 else:
     read_pair_tags = ["_R1","_R2"]
+    paired = "PE"
+
+# if config["lib_reverse_read_length"] == 0:
+#     read_pair_tags = [""]
+# else:
+#     read_pair_tags = ["_R1","_R2"]
 
 wildcard_constraints:
     sample = "|".join(sample_tab.sample_name),
