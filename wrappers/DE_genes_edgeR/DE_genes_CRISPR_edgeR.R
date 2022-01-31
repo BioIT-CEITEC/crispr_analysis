@@ -20,13 +20,13 @@ library(data.table)
 library(ggplot2)
 library(gplots)
 
-setwd("/mnt/ssd/ssd_1/sequia/220127__crispr_analysis__Brunello_Haspin__2056/")
-args <- c("/mnt/ssd/ssd_3/references/general/CRISPR_Brunello/CRISPR_Brunello_mod.csv",
-          "counts/all_samples_report.tsv",
-          "DE_results/DMSO_d14_vs_1464_d7/DMSO_d14_vs_1464_d7.design_table.tsv",
-          "DE_results/DMSO_d14_vs_1464_d7/",
-          "10",
-          "True")
+# setwd("/mnt/ssd/ssd_1/sequia/220127__crispr_analysis__Brunello_Haspin__2056/")
+# args <- c("/mnt/ssd/ssd_3/references/general/CRISPR_Brunello/CRISPR_Brunello_mod.csv",
+#           "counts/all_samples_report.tsv",
+#           "DE_results/DMSO_d14_vs_1464_d7/DMSO_d14_vs_1464_d7.design_table.tsv",
+#           "DE_results/DMSO_d14_vs_1464_d7/",
+#           "10",
+#           "True")
 
 args = commandArgs(trailingOnly=TRUE)
 
