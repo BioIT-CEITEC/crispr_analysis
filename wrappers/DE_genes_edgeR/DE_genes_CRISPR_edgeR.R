@@ -20,16 +20,15 @@ library(data.table)
 library(ggplot2)
 library(gplots)
 
-args = commandArgs(trailingOnly=TRUE)
+setwd("/mnt/ssd/ssd_1/sequia/220127__crispr_analysis__Brunello_Haspin__2056/")
+args <- c("/mnt/ssd/ssd_3/references/general/CRISPR_Brunello/CRISPR_Brunello_mod.csv",
+          "counts/all_samples_report.tsv",
+          "DE_results/DMSO_d14_vs_1464_d7/DMSO_d14_vs_1464_d7.design_table.tsv",
+          "DE_results/DMSO_d14_vs_1464_d7/",
+          "10",
+          "True")
 
-# setwd("/mnt/nfs/shared/CFBioinformatics/all_projects/")
-# setwd("/mnt/ssd/ssd_1/snakemake/")
-# args <- c("/mnt/ssd/ssd_3/references/general/CRISPR_Brunello/CRISPR_Brunello_mod.csv",
-#           "stage470_Michal_-_Haspin_CRISPR/CRISPR_general_analysis/hsblastn_filter/all_samples_report.tsv",
-#           "stage470_Michal_-_Haspin_CRISPR/CRISPR_general_analysis/DE_genes_edgeR/1464_d14_vs_1668_d14/1464_d14_vs_1668_d14.design_table.tsv",
-#           "stage470_Michal_-_Haspin_CRISPR/CRISPR_general_analysis/DE_genes_edgeR/1464_d14_vs_1668_d14/",
-#           "20",
-#           "True")
+args = commandArgs(trailingOnly=TRUE)
 
 insert_lib_input <-args[1]
 counts_tab_input <- args[2]
@@ -55,14 +54,14 @@ design_tab[name %like% "^[0-9]", name:=paste0("X",name)]
 design_tab[,N:=.N,by=condition]
 if(design_tab[N==1,.N]>0) {
   new_cols = as.data.table(samples)[, design_tab[N == 1, name], with=F]
-  colnames(new_cols) = sub('rep1','rep2',colnames(new_cols))
+  colnames(new_cols) = paste0(colnames(new_cols), "_copy")
   samples = cbind(samples, as.data.frame(new_cols))
 }
 design_tab = as.data.frame(rbind(design_tab[,.SD,.SDcols=!c("N")], 
-                                 design_tab[N==1, .(sample=sub('rep1','rep2',sample), 
-                                                    name=sub('rep1','rep2',name), 
+                                 design_tab[N==1, .(sample=paste0(sample, "_copy"), 
+                                                    name=paste0(name, "_copy"), 
                                                     condition=as.factor(condition), 
-                                                    patient=sub('rep1','rep2',patient))]))
+                                                    patient=sub('1','2',patient))]))
 rownames(design_tab) <- design_tab$name
 
 # Remove samples not in a design (to avoid errors later)
