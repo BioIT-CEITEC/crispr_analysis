@@ -14,7 +14,11 @@
     ],
     "report_index": "final_report.html",
     "reports":[
-       "final_report.html"
+       "final_report.html",
+       "counts/all_samples_report.pdf",
+       "counts/all_samples_report.tsv",
+       "mapped/all_samples.stats.tsv",
+       "DE_results/*/*.graphs.pdf"
     ]
   },
   "general_params": [
