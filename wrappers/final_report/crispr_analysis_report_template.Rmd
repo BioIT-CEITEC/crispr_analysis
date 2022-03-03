@@ -46,7 +46,7 @@ Pipeline directory content description (only important files/folders are describ
 ```{r echo = FALSE, results = "asis"}
 path = "preprocessed_data"
 for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
 
@@ -54,7 +54,7 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
 ```{r echo = FALSE, results = "asis"}
 path = "mapped"
 for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recursive=T)){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
   * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
@@ -66,7 +66,7 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recurs
 ```{r echo = FALSE, results = "asis"}
 path = "counts"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
 
@@ -75,21 +75,21 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursiv
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results"
 for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
   * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results"
 for (i in list.files(paste0(snakemake@params$wdir, path), "sgRNAs_summary.tsv", recursive=T)){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
   * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
-  cat(sprintf("\t* [%s](.%s/%s)\n", basename(i), path, i))
+  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
 
