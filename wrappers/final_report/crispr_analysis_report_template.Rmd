@@ -71,25 +71,48 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursiv
 ```
 
 * `DE_results` (folder) - contains results of differential expression
-  * `*.gene_summary.tsv` (file) - result of DE on gene level:
+  * `edgeR` (folder) - contains results processed by [edgeR tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+    * `*.gene_summary.tsv` (file) - result of DE on gene level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results"
+path = "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
-  * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
+    * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results"
+path = "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "sgRNAs_summary.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
-  * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
+    * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results"
+path = "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
+}
+```
+  * `MAGeCK` (folder) - contains results processed by [MAGeCK tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html) tool
+    * `*.gene_summary.tsv` (file) - result of DE on gene level:
+```{r echo = FALSE, results = "asis"}
+path = "DE_results/MAGeCK"
+for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
+  cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
+}
+```
+    * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
+```{r echo = FALSE, results = "asis"}
+path = "DE_results/MAGeCK"
+for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
+  cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
+}
+```
+    * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
+```{r echo = FALSE, results = "asis"}
+path = "DE_results/MAGeCK"
+for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
+  cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
 

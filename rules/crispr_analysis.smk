@@ -14,6 +14,7 @@ from os.path import split
 
 def DE_conditions(wildcards):
     inputs = []
+    os.makedirs("DE_results", mode=0o664, exist_ok=True)
     if 'conditions_to_compare' in config and config["conditions_to_compare"] != "":
         if config["conditions_to_compare"] == "all":
             # create all pairs of conditions
@@ -28,8 +29,9 @@ def DE_conditions(wildcards):
             elif len(cond) < 2:
                 raise ValueError("Not enough conditions to compare, exactly 2 conditions needed!")
             else:
-                inputs.append(f"DE_results/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
-                design = f"DE_results/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.design_table.tsv"
+                inputs.append(f"DE_results/MAGeCK/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
+                inputs.append(f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
+                design = f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.design_table.tsv"
                 os.makedirs(os.path.dirname(design), exist_ok=True)
                 sample_tab.loc[sample_tab.condition == cond[0],("sample_name","sample_name","condition","tag")].set_axis(['sample', 'name', 'condition', 'patient'], axis='columns').drop_duplicates().to_csv(design, sep="\t", index=False)
                 sample_tab.loc[sample_tab.condition == cond[1],("sample_name","sample_name","condition","tag")].set_axis(['sample', 'name', 'condition', 'patient'], axis='columns').drop_duplicates().to_csv(design, sep="\t", header=False, index=False, mode="a")
@@ -50,19 +52,43 @@ rule final_report:
     script: "../wrappers/final_report/crispr_analysis_report_template.Rmd"
     
 
+rule DE_genes_MAGeCK:
+    input:  tsv = "hsblastn_filter/all_samples_report.tsv",
+            idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
+    output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.tsv",
+            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.tsv",
+            pdf  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.graphs.pdf",
+    log:    run = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log",
+    params: prefix = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}",
+            treats = lambda ws: sample_tab.loc[sample_tab.condition == ws.c1, "sample_name"].tolist(),
+            ctrls  = lambda ws: sample_tab.loc[sample_tab.condition == ws.c2, "sample_name"].tolist(),
+            # script = workflow.basedir+"/../wraps/crispr_analysis/DE_results/MAGeCK/DE_genes_CRISPR_edgeR.R",
+            norm_file = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.normalized.txt",
+            report_source   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.report.Rmd",
+            pdf_source  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.R",
+            norm_type = config["mageck_norm_method"],
+            zero_type = config["mageck_zero_type"],
+            zero_value= config["mageck_zero_value"],
+            adj_type =  config["mageck_padj_method"],
+            top  = config["top_genes"],
+            paired = config["use_tag_to_pair_samples"],
+    conda:  "../wrappers/DE_genes_MAGeCK/env.yaml"
+    script: "../wrappers/DE_genes_MAGeCK/script.py"
+    
+
 rule DE_genes_edgeR:
     input:  tsv = "counts/all_samples_report.tsv",
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
-    output: gene = "DE_results/{cond}/{cond}.gene_summary.tsv",
-            sg   = "DE_results/{cond}/{cond}.sgRNAs_summary.tsv",
-            pdf  = "DE_results/{cond}/{cond}.graphs.pdf",
-    log:    "DE_results/{cond}/{cond}.DE_genes_edgeR.log",
+    output: gene = "DE_results/edgeR/{cond}/{cond}.gene_summary.tsv",
+            sg   = "DE_results/edgeR/{cond}/{cond}.sgRNAs_summary.tsv",
+            pdf  = "DE_results/edgeR/{cond}/{cond}.graphs.pdf",
+    log:    "DE_results/edgeR/{cond}/{cond}.DE_genes_edgeR.log",
     params: script = workflow.basedir+"/wrappers/DE_genes_edgeR/DE_genes_CRISPR_edgeR.R",
-            odir = "DE_results/{cond}/",
-            design = "DE_results/{cond}/{cond}.design_table.tsv",
-            gene = "DE_results/{cond}/gene_summary.tsv",
-            sg   = "DE_results/{cond}/sgRNAs_summary.tsv",
-            pdf  = "DE_results/{cond}/graphs.pdf",
+            odir = "DE_results/edgeR/{cond}/",
+            design = "DE_results/edgeR/{cond}/{cond}.design_table.tsv",
+            gene = "DE_results/edgeR/{cond}/gene_summary.tsv",
+            sg   = "DE_results/edgeR/{cond}/sgRNAs_summary.tsv",
+            pdf  = "DE_results/edgeR/{cond}/graphs.pdf",
             top  = config["top_genes"],
             paired = config["use_tag_to_pair_samples"],
     conda:  "../wrappers/DE_genes_edgeR/env.yaml"
