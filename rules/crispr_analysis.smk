@@ -14,7 +14,7 @@ from os.path import split
 
 def DE_conditions(wildcards):
     inputs = []
-    os.makedirs("DE_results", mode=0o664, exist_ok=True)
+    os.makedirs("DE_results", exist_ok=True)
     if 'conditions_to_compare' in config and config["conditions_to_compare"] != "":
         if config["conditions_to_compare"] == "all":
             # create all pairs of conditions
@@ -29,7 +29,7 @@ def DE_conditions(wildcards):
             elif len(cond) < 2:
                 raise ValueError("Not enough conditions to compare, exactly 2 conditions needed!")
             else:
-                inputs.append(f"DE_results/MAGeCK/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
+                inputs.append(f"DE_results/MAGeCK/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.txt")
                 inputs.append(f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
                 design = f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.design_table.tsv"
                 os.makedirs(os.path.dirname(design), exist_ok=True)
@@ -53,12 +53,12 @@ rule final_report:
     
 
 rule DE_genes_MAGeCK:
-    input:  tsv = "hsblastn_filter/all_samples_report.tsv",
+    input:  tsv = "counts/all_samples_report.tsv",
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
-    output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.tsv",
-            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.tsv",
-            pdf  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.graphs.pdf",
-    log:    run = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log",
+    output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.txt",
+            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.txt",
+            #pdf  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.graphs.pdf",
+    log:    run  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log",
     params: prefix = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}",
             treats = lambda ws: sample_tab.loc[sample_tab.condition == ws.c1, "sample_name"].tolist(),
             ctrls  = lambda ws: sample_tab.loc[sample_tab.condition == ws.c2, "sample_name"].tolist(),
