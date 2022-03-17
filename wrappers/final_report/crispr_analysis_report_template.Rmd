@@ -108,12 +108,12 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.txt", r
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
-#    * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
-#```{r echo = FALSE, results = "asis"}
-#path = "DE_results/MAGeCK"
-#for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
-#  cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
-#}
-#```
+    * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
+```{r echo = FALSE, results = "asis"}
+path = "DE_results/MAGeCK"
+for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
+  cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
+}
+```
 
 * [`final_report.html`](./final_report.html) (file) - this report.
