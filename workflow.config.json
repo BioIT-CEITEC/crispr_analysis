@@ -18,7 +18,8 @@
        "counts/all_samples_report.pdf",
        "counts/all_samples_report.tsv",
        "mapped/all_samples.stats.tsv",
-       "DE_results/*/*.graphs.pdf"
+       "DE_results/*/*/*.graphs.pdf",
+       "DE_results/*/*/*summary*"
     ]
   },
   "general_params": [
