@@ -50,13 +50,17 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
 }
 ```
 
-* `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src)
+* `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
+
+<!--
 ```{r echo = FALSE, results = "asis"}
 path = "mapped"
 for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
+-->
+  * `*.hsblastn.tsv` (file) - is a tabular result of alignment of particular sample's inserts to the reference
   * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
 
 * `counts` (folder) - contains results with inserts counts.
@@ -79,10 +83,10 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", re
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
-    * `*.sgRNAs_summary.tsv` (file) - result of DE on sgRNA level:
+    * `*.sgrna_summary.tsv` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results/edgeR"
-for (i in list.files(paste0(snakemake@params$wdir, path), "sgRNAs_summary.tsv", recursive=T)){
+for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
@@ -97,14 +101,14 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursiv
     * `*.gene_summary.txt` (file) - result of DE on gene level:
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results/MAGeCK"
-for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.txt", recursive=T)){
+for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
-    * `*.sgRNAs_summary.txt` (file) - result of DE on sgRNA level:
+    * `*.sgrna_summary.txt` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
 path = "DE_results/MAGeCK"
-for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.txt", recursive=T)){
+for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```

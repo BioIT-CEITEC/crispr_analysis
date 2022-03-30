@@ -29,7 +29,7 @@ def DE_conditions(wildcards):
             elif len(cond) < 2:
                 raise ValueError("Not enough conditions to compare, exactly 2 conditions needed!")
             else:
-                inputs.append(f"DE_results/MAGeCK/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.txt")
+                inputs.append(f"DE_results/MAGeCK/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
                 inputs.append(f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.gene_summary.tsv")
                 design = f"DE_results/edgeR/{cond[0]}_vs_{cond[1]}/{cond[0]}_vs_{cond[1]}.design_table.tsv"
                 os.makedirs(os.path.dirname(design), exist_ok=True)
@@ -55,14 +55,16 @@ rule final_report:
 rule DE_genes_MAGeCK:
     input:  tsv = "counts/all_samples_report.tsv",
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
-    output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.txt",
-            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.txt",
+    output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.tsv",
+            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.tsv",
             #pdf  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.graphs.pdf",
     log:    run  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log",
     params: prefix = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}",
             treats = lambda ws: sample_tab.loc[sample_tab.condition == ws.c2, "sample_name"].tolist(),
             ctrls  = lambda ws: sample_tab.loc[sample_tab.condition == ws.c1, "sample_name"].tolist(),
             # script = workflow.basedir+"/../wraps/crispr_analysis/DE_results/MAGeCK/DE_genes_CRISPR_edgeR.R",
+            gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.txt",
+            sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.txt",
             norm_file = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.normalized.txt",
             report_source   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.report.Rmd",
             pdf_source  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.R",
@@ -80,7 +82,7 @@ rule DE_genes_edgeR:
     input:  tsv = "counts/all_samples_report.tsv",
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
     output: gene = "DE_results/edgeR/{cond}/{cond}.gene_summary.tsv",
-            sg   = "DE_results/edgeR/{cond}/{cond}.sgRNAs_summary.tsv",
+            sg   = "DE_results/edgeR/{cond}/{cond}.sgrna_summary.tsv",
             pdf  = "DE_results/edgeR/{cond}/{cond}.graphs.pdf",
     log:    "DE_results/edgeR/{cond}/{cond}.DE_genes_edgeR.log",
     params: script = workflow.basedir+"/wrappers/DE_genes_edgeR/DE_genes_CRISPR_edgeR.R",

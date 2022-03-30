@@ -42,7 +42,7 @@ if not 'conditions_to_compare' in config:
 if not 'top_genes' in config:
     config['top_genes'] = 10    # Top genes to be shown in resulting graphs.pdf from DE part
 if not 'use_tag_to_pair_samples' in config:
-    config['use_tag_to_pair_samples'] = True
+    config['use_tag_to_pair_samples'] = False
 if not 'mageck_padj_method' in config:
     config["mageck_padj_method"] = "fdr" # fdr,holm,pounds
 if not 'mageck_zero_type' in config:

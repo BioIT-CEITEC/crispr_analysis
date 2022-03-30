@@ -40,9 +40,15 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-# command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {snakemake.log.run} 2>&1"
-# f = open(snakemake.log.run, 'at')
-# f.write("## COMMAND: "+command+"\n")
-# f.close()
-# shell(command)
+command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {snakemake.log.run} 2>&1"
+f = open(snakemake.log.run, 'at')
+f.write("## COMMAND: "+command+"\n")
+f.close()
+shell(command)
+
+command = f"mv {snakemake.params.sg} {snakemake.output.sg} >> {snakemake.log.run} 2>&1"
+f = open(snakemake.log.run, 'at')
+f.write("## COMMAND: "+command+"\n")
+f.close()
+shell(command)
 

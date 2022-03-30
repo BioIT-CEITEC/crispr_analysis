@@ -10,6 +10,7 @@
       "preprocessed_data/*",
       "mapped/*",
       "counts/*",
+      "logs/*",
       "final_report.html"
     ],
     "report_index": "final_report.html",
@@ -17,6 +18,7 @@
        "final_report.html",
        "counts/all_samples_report.pdf",
        "counts/all_samples_report.tsv",
+       "counts/*/*graphs.pdf",
        "mapped/all_samples.stats.tsv",
        "DE_results/*/*/*.graphs.pdf",
        "DE_results/*/*/*summary*"
@@ -47,6 +49,16 @@
           "CRISPR_Brunello": "CRISPR_Brunello",
           "CRISPR_GeCKO": "CRISPR_GeCKO"
         }
+      },
+      "conditions_to_compare": {
+        "label": "Conditions to compare",
+        "type": "string",
+        "default": "all"
+      },
+      "use_tag_to_pair_samples": {
+        "label": "Pair samples by Tag",
+        "type": "bool",
+        "default": false
       }
     },
     "detailed": {
@@ -54,11 +66,6 @@
         "label": "CRISPR adapter",
         "type": "string",
         "default": "GGAAAGGACGAAACACCG"
-      },
-      "conditions_to_compare": {
-        "label": "Conditions to compare",
-        "type": "string",
-        "default": "all"
       },
       "error_rate": {
         "label": "Allowed error rate of adapters",
