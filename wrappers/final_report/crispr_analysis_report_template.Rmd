@@ -51,7 +51,9 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
 ```
 
 * `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
-
+  * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
+  * `*.hsblastn.tsv` (file) - is a tabular result of alignment of particular sample's inserts to the reference
+  
 <!--
 ```{r echo = FALSE, results = "asis"}
 path = "mapped"
@@ -60,8 +62,6 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recurs
 }
 ```
 -->
-  * `*.hsblastn.tsv` (file) - is a tabular result of alignment of particular sample's inserts to the reference
-  * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
 
 * `counts` (folder) - contains results with inserts counts.
   * [all_samples_report.tsv](./counts/all_samples_report.tsv) (file) - raw counts for sample data against reference guide sequences

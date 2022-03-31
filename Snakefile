@@ -51,6 +51,8 @@ if not 'mageck_zero_value' in config:
     config["mageck_zero_value"] = 0
 if not 'mageck_norm_method' in config:
     config["mageck_norm_method"] = "median" # none, median, total
+if not 'mageck_lcf_method' in config:
+    config["mageck_lcf_method"] = "alphamedian" # median, alphamedian, mean, alphamean, secondbest
 
 
 # setting organism from reference

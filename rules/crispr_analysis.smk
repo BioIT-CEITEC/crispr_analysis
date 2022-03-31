@@ -72,6 +72,7 @@ rule DE_genes_MAGeCK:
             zero_type = config["mageck_zero_type"],
             zero_value= config["mageck_zero_value"],
             adj_type =  config["mageck_padj_method"],
+            lfc_type =  config["mageck_lcf_method"],
             top  = config["top_genes"],
             paired = config["use_tag_to_pair_samples"],
     conda:  "../wrappers/DE_genes_MAGeCK/env.yaml"
