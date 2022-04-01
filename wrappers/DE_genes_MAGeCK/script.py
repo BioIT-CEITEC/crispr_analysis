@@ -33,7 +33,7 @@ command = f"mkdir -p $(dirname {snakemake.params.prefix});"+\
           f" --remove-zero-threshold {str(snakemake.params.zero_value)}"+\
           f" --normcounts-to-file"+\
           f" --norm-method {snakemake.params.norm_type}"+\
-          f" --gene-lfc-method {snakemake.params.lfc_type}"
+          f" --gene-lfc-method {snakemake.params.lfc_type}"+\
           f"{add_params}"+\
           f" -n {snakemake.params.prefix}) >> {snakemake.log.run} 2>&1"
 f = open(snakemake.log.run, 'at')
