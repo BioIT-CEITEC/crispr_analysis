@@ -58,7 +58,7 @@ rule DE_genes_MAGeCK:
     output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.tsv",
             sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.tsv",
             #pdf  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.graphs.pdf",
-    log:    run  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log",
+    log:    "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log"
     params: prefix = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}",
             treats = lambda ws: sample_tab.loc[sample_tab.condition == ws.c2, "sample_name"].tolist(),
             ctrls  = lambda ws: sample_tab.loc[sample_tab.condition == ws.c1, "sample_name"].tolist(),
@@ -142,7 +142,7 @@ rule resolve_dups:
     input:  counts = "counts/{sample}/{sample}_unique_inserts_tab_counts.tsv",
     output: table = "counts/{sample}/{sample}_unique_inserts_tab_counts_resolved_duplicates.tsv",
     log:    "logs/{sample}/resolve_dups.log",
-    params: script = workflow.basedir+"/wrappers/resolve_dups/resolve_count_duplicates.py",
+    params: script = workflow.basedir+"/wrappers/resolve_dups/resolve_count_duplicates_v2.py",
     conda:  "../wrappers/resolve_dups/env.yaml"
     script: "../wrappers/resolve_dups/script.py"
     

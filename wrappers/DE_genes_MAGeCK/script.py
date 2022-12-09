@@ -8,13 +8,14 @@ import re
 from snakemake.shell import shell
 
 shell.executable("/bin/bash")
+log_file = str(snakemake.log)
 
-f = open(snakemake.log.run, 'a+')
+f = open(log_file, 'a+')
 f.write("\n##\n## RULE: DE_genes_MAGeCK \n##\n")
 f.close()
 
 version = str(subprocess.Popen("conda list 2>&1 ", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
-f = open(snakemake.log.run, 'at')
+f = open(log_file, 'at')
 f.write("## CONDA: "+version+"\n")
 f.close()
 
@@ -33,22 +34,26 @@ command = f"mkdir -p $(dirname {snakemake.params.prefix});"+\
           f" --remove-zero-threshold {str(snakemake.params.zero_value)}"+\
           f" --normcounts-to-file"+\
           f" --norm-method {snakemake.params.norm_type}"+\
-          f" --gene-lfc-method {snakemake.params.lfc_type}"
+          f" --gene-lfc-method {snakemake.params.lfc_type}"+\
           f"{add_params}"+\
-          f" -n {snakemake.params.prefix}) >> {snakemake.log.run} 2>&1"
-f = open(snakemake.log.run, 'at')
+          f" -n {snakemake.params.prefix}) >> {log_file} 2>&1"
+f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {snakemake.log.run} 2>&1"
-f = open(snakemake.log.run, 'at')
+command = f"(time Rscript {snakemake.params.script}"+\
+          f" {snakemake.params.gene}"+\
+          " {snakemake.input.tsv} {snakemake.params.design} {snakemake.params.odir} {snakemake.params.top} {snakemake.params.paired}) >> {log_file} 2>&1"
+
+command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {log_file} 2>&1"
+f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"mv {snakemake.params.sg} {snakemake.output.sg} >> {snakemake.log.run} 2>&1"
-f = open(snakemake.log.run, 'at')
+command = f"mv {snakemake.params.sg} {snakemake.output.sg} >> {log_file} 2>&1"
+f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
