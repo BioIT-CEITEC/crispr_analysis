@@ -25,7 +25,7 @@ if snakemake.params.paired:
   
 # PREFIX="DE_genes_mageck/NOTCH1_d21_vs_NOTCH1_d0.default/NOTCH1_d21_vs_NOTCH1_d0"; mkdir -p $PREFIX && $(which time) --verbose mageck test -k hsblastn_filter/all_samples_report.tsv -t NOTCH1_d21_rep1,NOTCH1_d21_rep2 -c NOTCH1_d0_rep1,NOTCH1_d0_rep2 --adjust-method fdr --remove-zero both --remove-zero-threshold 0 --pdf-report --normcounts-to-file -n $PREFIX 2>&1 | tee ${PREFIX}.log
 command = f"mkdir -p $(dirname {snakemake.params.prefix});"+\
-          f" (time mageck test"+\
+          f" $(which time) mageck test"+\
           f" -k {snakemake.input.tsv}"+\
           f" -t {','.join(snakemake.params.treats)}"+\
           f" -c {','.join(snakemake.params.ctrls)}"+\
@@ -36,25 +36,42 @@ command = f"mkdir -p $(dirname {snakemake.params.prefix});"+\
           f" --norm-method {snakemake.params.norm_type}"+\
           f" --gene-lfc-method {snakemake.params.lfc_type}"+\
           f"{add_params}"+\
-          f" -n {snakemake.params.prefix}) >> {log_file} 2>&1"
+          f" -n {snakemake.params.prefix} >> {log_file} 2>&1"
 f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"(time Rscript {snakemake.params.script}"+\
+command = f"$(which time) Rscript -e \"rmarkdown::render('{snakemake.params.report_source}',params=list(args = myarg))\""+\
+          f" >> {snakemake.output.html} 2>> {log_file}"
+f = open(log_file, 'at')
+f.write("## COMMAND: "+command+"\n")
+f.close()
+shell(command)
+
+# command = f"$(which time) Rscript {snakemake.params.script}"+\
+#           f" {snakemake.params.gene}"+\
+#           f" {snakemake.input.tsv} {snakemake.params.design} {snakemake.params.odir} {snakemake.params.top} {snakemake.params.paired} >> {log_file} 2>&1"
+command = f"$(which time) Rscript {snakemake.params.script}"+\
           f" {snakemake.params.gene}"+\
-          " {snakemake.input.tsv} {snakemake.params.design} {snakemake.params.odir} {snakemake.params.top} {snakemake.params.paired}) >> {log_file} 2>&1"
-
-command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {log_file} 2>&1"
+          f" {snakemake.params.gene_neg}"+\
+          f" {snakemake.params.gene_pos}"+\
+          f" {snakemake.output.gene}"+\
+          f" >> {log_file} 2>&1"
 f = open(log_file, 'at')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"mv {snakemake.params.sg} {snakemake.output.sg} >> {log_file} 2>&1"
-f = open(log_file, 'at')
-f.write("## COMMAND: "+command+"\n")
-f.close()
-shell(command)
+# command = f"mv {snakemake.params.gene} {snakemake.output.gene} >> {log_file} 2>&1"
+# f = open(log_file, 'at')
+# f.write("## COMMAND: "+command+"\n")
+# f.close()
+# shell(command)
+# 
+# command = f"mv {snakemake.params.sg} {snakemake.output.sg} >> {log_file} 2>&1"
+# f = open(log_file, 'at')
+# f.write("## COMMAND: "+command+"\n")
+# f.close()
+# shell(command)
 
