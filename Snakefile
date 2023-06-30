@@ -11,8 +11,10 @@ min_version("5.18.0")
 
 configfile: "config.json"
 
-GLOBAL_REF_PATH = "/mnt/references"
-GLOBAL_TMPD_PATH = "./tmp/"
+GLOBAL_REF_PATH = config["globalResources"]
+GLOBAL_TMPD_PATH = config["globalTmpdPath"]
+
+os.makedirs(GLOBAL_TMPD_PATH, exist_ok=True)
 
 # Reference processing
 #
@@ -56,10 +58,10 @@ if not 'mageck_lcf_method' in config:
 
 
 # setting organism from reference
-f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
-reference_dict = json.load(f)
-f.close()
-# config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].values()][0]
+#f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
+#reference_dict = json.load(f)
+#f.close()
+#config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].values()][0]
 
 
 ##### Config processing #####
