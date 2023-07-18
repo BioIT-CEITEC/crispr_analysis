@@ -57,7 +57,7 @@ rule DE_genes_MAGeCK:
             idx = expand("{ref_dir}/{ref}_mod.csv", ref_dir=reference_directory, ref=config["crispr_type"])[0],
     output: gene = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.gene_summary.tsv",
             # sg   = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.sgrna_summary.tsv",
-            html  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.report.nb.html",
+            # html  = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.report.nb.html",
     log:    "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}.DE_genes_MAGeCK.log"
     params: prefix = "DE_results/MAGeCK/{c1}_vs_{c2}/{c1}_vs_{c2}",
             treats = lambda ws: sample_tab.loc[sample_tab.condition == ws.c2, "sample_name"].tolist(),
