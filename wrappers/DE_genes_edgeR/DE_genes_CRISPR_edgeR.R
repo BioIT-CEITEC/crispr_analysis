@@ -86,19 +86,29 @@ barplot(rowSums(d$counts), las=2, main="Counts per sgRNA",
         axisnames=FALSE, cex.axis=0.8)
 
 logCPM<-cpm(d, log=TRUE, prior.count=1)
-logCPMc<-removeBatchEffect(logCPM, design_tab$patient)
+if(! "new_cols" %in% ls()) {
+  logCPMc<-removeBatchEffect(logCPM, design_tab$patient)
+}
 
-plotMDS(logCPM, col=cols, main="MDS Plot: with batch effect")
-#legend("topleft", legend=c("Control", "Drug"), col=c(3,4), pch=15)
-plotMDS(logCPMc, col=cols, main="MDS Plot: removed batch effect")
-#legend("topleft", legend=c("Inf#1", "Inf#2"), col=c(1,2), pch=15)
+if(! "new_cols" %in% ls()) {
+  plotMDS(logCPM, col=cols, main="MDS Plot: with batch effect")
+  #legend("topleft", legend=c("Control", "Drug"), col=c(3,4), pch=15)
+
+  plotMDS(logCPMc, col=cols, main="MDS Plot: removed batch effect")
+  #legend("topleft", legend=c("Inf#1", "Inf#2"), col=c(1,2), pch=15)
+} else {
+  plotMDS(logCPM, col=cols, main="MDS Plot")
+  #legend("topleft", legend=c("Control", "Drug"), col=c(3,4), pch=15)
+}
 
 par(cex.main=0.8)
 heatmap.2(cor(logCPM),trace = 'none',density.info = 'none',cexRow = 0.8,cexCol = 0.8,offsetRow = -0.2,offsetCol = -0.2,notecol="black",cellnote = round(cor(logCPM),3),notecex=0.7,
           main = "Correlation of samples with batch effect")
 
-heatmap.2(cor(logCPMc),trace = 'none',density.info = 'none',cexRow = 0.8,cexCol = 0.8,offsetRow = -0.2,offsetCol = -0.2,notecol="black",cellnote = round(cor(logCPMc),3),notecex=0.7,
-          main = "Correlation of samples with removed batch effect")
+if(! "new_cols" %in% ls()) {
+  heatmap.2(cor(logCPMc),trace = 'none',density.info = 'none',cexRow = 0.8,cexCol = 0.8,offsetRow = -0.2,offsetCol = -0.2,notecol="black",cellnote = round(cor(logCPMc),3),notecex=0.7,
+            main = "Correlation of samples with removed batch effect")
+}
 par(cex.main=1.0)
 
 if(paired){
@@ -175,17 +185,18 @@ camera.res <- camera.res[, lapply(.SD, paste0, collapse=";"), by=.(Row.names,NGe
 #end new part
 
 colnames(camera.res) <- c("Gene","NsgRNAs","Direction","PValue","FDR","sgRNAs","logFC_per_sgRNA","P_values_per_sgRNA",paste0(colnames(d$counts),"_raw_counts"),paste0(colnames(d$counts),"_logCPM_normalized_counts"))
-setorder(camera.res,FDR)
+setorder(camera.res, FDR)
 fwrite(camera.res, paste0(output_dir,"gene_summary.tsv"), sep = "\t", row.names = F)
 
 if(camera.res[FDR<=0.05, .N] > 0) {
-  for (gene in camera.res[FDR<=0.05, .SD[1:min(top_genes,.N),Gene]]){
-    barcodeplot(lrt$table$logFC,index=genesymbollist[[gene]],
+  for (gene in camera.res[FDR<=0.05, .SD[1:min(top_genes,.N), Gene] ]){
+    barcodeplot(lrt$table$logFC, 
+                index=genesymbollist[[gene]],
                 main=paste("Barcodeplot for Gene",gene),
                 labels=c("Negative logFC", "Positive logFC"),
                 quantile=c(-0.5,0.5))
     # Data 
-    b <-logCPMc[genesymbollist[[gene]],]
+    b <- logCPM[genesymbollist[[gene]],]
     b <- reshape2::melt(b)
     #Graph
     print(qplot( x=Var2 , y=value , data=b , geom=c("boxplot","jitter"),  fill=Var2, xlab = "Samples", ylab = "logCPM values for each sgRNA", main = paste0("logCPM values per sgRNA without batch effect for gene ", gene)))

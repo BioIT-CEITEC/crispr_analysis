@@ -47,7 +47,8 @@
         "default": "CRISPR_Brunello",
         "list": {
           "CRISPR_Brunello": "CRISPR_Brunello",
-          "CRISPR_GeCKO": "CRISPR_GeCKO"
+          "CRISPR_GeCKO": "CRISPR_GeCKO",
+          "CRISPR_VBC": "CRISPR_VBC"
         }
       },
       "conditions_to_compare": {
