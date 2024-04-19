@@ -57,10 +57,10 @@ if not 'mageck_lcf_method' in config:
 
 
 # setting organism from reference
-f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
-reference_dict = json.load(f)
-f.close()
-# config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].values()][0]
+#f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
+#reference_dict = json.load(f)
+#f.close()
+#config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].values()][0]
 
 
 ##### Config processing #####

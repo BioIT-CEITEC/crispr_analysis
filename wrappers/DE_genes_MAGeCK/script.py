@@ -42,12 +42,12 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-command = f"$(which time) Rscript -e \"rmarkdown::render('{snakemake.params.report_source}',params=list(args = myarg))\""+\
-          f" >> {snakemake.output.html} 2>> {log_file}"
-f = open(log_file, 'at')
-f.write("## COMMAND: "+command+"\n")
-f.close()
-shell(command)
+# command = f"$(which time) Rscript -e \"rmarkdown::render('{snakemake.params.report_source}',params=list(args = myarg))\""+\
+#           f" >> {snakemake.output.html} 2>> {log_file}"
+# f = open(log_file, 'at')
+# f.write("## COMMAND: "+command+"\n")
+# f.close()
+# shell(command)
 
 # command = f"$(which time) Rscript {snakemake.params.script}"+\
 #           f" {snakemake.params.gene}"+\
