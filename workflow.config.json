@@ -63,10 +63,24 @@
       }
     },
     "detailed": {
-      "adapter": {
+      "crispr_adapter": {
         "label": "CRISPR adapter",
-        "type": "string",
-        "default": "GGAAAGGACGAAACACCG"
+        "type": "enum",
+        "default": "Brunello",
+        "list": {
+          "Brunello": "GGAAAGGACGAAACACCG",
+          "VBC": "TTCCAGCATAGCTCTTAAAC",
+          "GeCKO": "UNKNOWN"
+        },
+        "conditions": {
+          "value": {
+            "crispr_type": {
+              "CRISPR_Brunello": "Brunello",
+              "CRISPR_GeCKO": "GeCKO",
+              "CRISPR_VBC": "VBC"
+            }
+          }
+        }
       },
       "error_rate": {
         "label": "Allowed error rate of adapters",

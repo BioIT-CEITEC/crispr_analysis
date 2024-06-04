@@ -26,8 +26,8 @@ if not "full_name_rep" in config:
 
 if not "crispr_type" in config:
     config['crispr_type'] = 'CRISPR_Brunello'
-if not "adapter" in config:
-    config['adapter'] = "GGAAAGGACGAAACACCG"
+if not "crispr_adapter" in config:
+    config['crispr_adapter'] = "GGAAAGGACGAAACACCG"
 if not 'error_rate' in config:
     config['error_rate'] = '0.2'    # Allowed error rate of adapters
 if not 'min_overlap' in config:

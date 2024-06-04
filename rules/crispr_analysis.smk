@@ -194,7 +194,7 @@ rule preprocess_SE:
     log:    "logs/{sample}/preprocess_SE.log",
     threads:    10
     resources:  mem = 10
-    params: adapter = config["adapter"],
+    params: adapter = config["crispr_adapter"],
             error_rate = config["error_rate"],
             min_overlap = config["min_overlap"],
             times = config["times"],
