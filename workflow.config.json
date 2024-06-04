@@ -66,18 +66,18 @@
       "crispr_adapter": {
         "label": "CRISPR adapter",
         "type": "enum",
-        "default": "Brunello",
+        "default": "GGAAAGGACGAAACACCG",
         "list": {
-          "Brunello": "GGAAAGGACGAAACACCG",
-          "VBC": "TTCCAGCATAGCTCTTAAAC",
-          "GeCKO": "UNKNOWN"
+          "GGAAAGGACGAAACACCG": "Brunello (GGAAAGGACGAAACACCG)",
+          "TTCCAGCATAGCTCTTAAAC": "VBC (TTCCAGCATAGCTCTTAAAC)",
+          "UNKNOWN": "GeCKO (UNKNOWN)"
         },
         "conditions": {
           "value": {
             "crispr_type": {
-              "CRISPR_Brunello": "Brunello",
-              "CRISPR_GeCKO": "GeCKO",
-              "CRISPR_VBC": "VBC"
+              "CRISPR_Brunello": "GGAAAGGACGAAACACCG",
+              "CRISPR_GeCKO": "UNKNOWN",
+              "CRISPR_VBC": "TTCCAGCATAGCTCTTAAAC"
             }
           }
         }
