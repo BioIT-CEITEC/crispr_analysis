@@ -15,6 +15,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(ggplot2)
 ```
 
 #### *Project: `r snakemake@params$name`*
@@ -44,10 +46,18 @@ Pipeline directory content description (only important files/folders are describ
     * `*.inserts.fa` (file) - contains unique inserts (`r snakemake@params$guide_len`nt long pieces of reads). This is input for following alignment process.
     * `*.inserts.counts` (file) - contains abundance of unique inserts in original fastq file.
 ```{r echo = FALSE, results = "asis"}
-path = "preprocessed_data"
+path <- "preprocessed_data"
 for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
+```
+
+```{r stat1, echo = FALSE, results = "asis"}
+stat1 <- fread(paste0(snakemake@params$wdir, "mapped/all_samples.stats.tsv"))
+stat1[,sample:=gsub(".stats.tsv", "", sample)
+setorder(stat1, sample)
+mstat1<-melt(stat1,id.vars = "sample")
+
 ```
 
 * `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
@@ -68,7 +78,7 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recurs
   * [all_samples_report.pdf](./counts/all_samples_report.pdf) (file) - report summarising alignment data with various statistics
   * `*_graphs.pdf` (file) - shows inserts histograms:
 ```{r echo = FALSE, results = "asis"}
-path = "counts"
+path <- "counts"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
@@ -78,21 +88,21 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursiv
   * `edgeR` (folder) - contains results processed by [edgeR tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
     * `*.gene_summary.tsv` (file) - result of DE on gene level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/edgeR"
+path <- "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
     * `*.sgrna_summary.tsv` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/edgeR"
+path <- "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
     * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/edgeR"
+path <- "DE_results/edgeR"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
@@ -100,21 +110,21 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursiv
   * `MAGeCK` (folder) - contains results processed by [MAGeCK tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html) tool
     * `*.gene_summary.txt` (file) - result of DE on gene level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/MAGeCK"
+path <- "DE_results/MAGeCK"
 for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
     * `*.sgrna_summary.txt` (file) - result of DE on sgRNA level:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/MAGeCK"
+path <- "DE_results/MAGeCK"
 for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
     * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
 ```{r echo = FALSE, results = "asis"}
-path = "DE_results/MAGeCK"
+path <- "DE_results/MAGeCK"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
   cat(sprintf("\t\t* [%s](%s/%s)\n", basename(i), path, i))
 }
