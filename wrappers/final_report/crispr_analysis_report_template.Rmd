@@ -17,6 +17,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(data.table)
 library(ggplot2)
+library(plotly)
 ```
 
 #### *Project: `r snakemake@params$name`*
@@ -58,12 +59,38 @@ stat1[,sample:=gsub(".stats.tsv", "", sample)
 setorder(stat1, sample)
 mstat1<-melt(stat1,id.vars = "sample")
 
+total_inserts <- mstat1[variable %like% "original", ]$value[1]
+mstat1[variable %like% "targeted inserts", `:=`(perc= round(value/total_inserts*100,2), perc_pos=value/2)]
+
+stat1_read <- ggplot(mstat1[variable %like% "reads"],aes(value, sample, fill=variable)) +
+geom_col(position = "dodge") +
+theme_bw() +
+theme(legend.position = "bottom") +
+xlab("# of reads") + ylab("") +
+scale_fill_manual(name="", values = c("firebrick","royalblue"), labels = c("mapped","unmapped"))
+
+stat1_inserts <- ggplot(mstat1[variable %like% "targeted inserts"],aes(value, sample, fill=variable)) +
+geom_col(position = "dodge") +
+geom_text(aes(x=perc_pos, label = paste0(perc, "%")), position = position_dodge(width = 1), hjust = -0.1) +
+theme_bw() +
+theme(legend.position = "bottom") +
+xlab("# of inserts") + ylab("") +
+scale_fill_manual(name="", values = c("firebrick","royalblue"), labels = c("targeted","not targeted"))
+
 ```
 
 * `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
   * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
   * `*.hsblastn.tsv` (file) - is a tabular result of alignment of particular sample's inserts to the reference
-  
+
+```{r mapped-read, echo = FALSE, results = "asis"}
+ggplotly(stat1_read)
+```
+
+```{r mapped-inserts, echo = FALSE, results = "asis"}
+ggplotly(stat1_inserts)
+```
+
 <!--
 ```{r echo = FALSE, results = "asis"}
 path = "mapped"
@@ -72,6 +99,18 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recurs
 }
 ```
 -->
+
+```{r stat2, echo = FALSE, results = "asis"}
+stat2 <- fread(paste0(snakemake@params$wdir, "counts/all_samples_report.tsv"))
+mstat2 <- melt(stat2,id.vars = c("sgRNA", "Gene"), variable.name = "sample")
+mstat3 <- mstat2[, value_gene:=sum(value), by=.(Gene,sample)]
+mstat3[, var_per_gene:=var(value_gene), by=.(Gene)] # get the variance per gene
+setorder(mstat3, -var_per_gene,Gene, sample)
+
+top10_genes <- head(unique(mstat2[!Gene %like% "Control",]$Gene),10)
+stat2_top10 <- stat2[Gene %in% top10_genes]
+```
+
 
 * `counts` (folder) - contains results with inserts counts.
   * [all_samples_report.tsv](./counts/all_samples_report.tsv) (file) - raw counts for sample data against reference guide sequences
