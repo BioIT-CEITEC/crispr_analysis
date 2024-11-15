@@ -17,7 +17,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(data.table)
 library(ggplot2)
-library(plotly)
+library(ggiraph)
 ```
 
 #### *Project: `r snakemake@params$name`*
@@ -42,11 +42,12 @@ CRISPR analysis pipeline is based on ...
 
 Pipeline directory content description (only important files/folders are described). The pipeline starts with the raw fastq files ...
 
-* `preprocessed_data` (folder) - contains files with preprocessed sequences and QC data of clean fastq files as a result of [FastQC tool](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+#### `preprocessed_data` (folder) - contains files with preprocessed sequences and QC data of clean fastq files as a result of [FastQC tool](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
     * `*_clean_SE.fastq.gz` (compressed file) - is a clean fastq file as a result of trimming process by [Cutadapt tool](https://cutadapt.readthedocs.io/en/stable/).
     * `*.inserts.fa` (file) - contains unique inserts (`r snakemake@params$guide_len`nt long pieces of reads). This is input for following alignment process.
     * `*.inserts.counts` (file) - contains abundance of unique inserts in original fastq file.
-```{r echo = FALSE, results = "asis"}
+
+```{r fastqc, echo = FALSE, results = "asis"}
 path <- "preprocessed_data"
 for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
@@ -55,7 +56,7 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "fastqc.html")){
 
 ```{r stat1, echo = FALSE, results = "asis"}
 stat1 <- fread(paste0(snakemake@params$wdir, "mapped/all_samples.stats.tsv"))
-stat1[,sample:=gsub(".stats.tsv", "", sample)
+stat1[,sample:=gsub(".stats.tsv", "", sample)]
 setorder(stat1, sample)
 mstat1<-melt(stat1,id.vars = "sample")
 
@@ -63,14 +64,14 @@ total_inserts <- mstat1[variable %like% "original", ]$value[1]
 mstat1[variable %like% "targeted inserts", `:=`(perc= round(value/total_inserts*100,2), perc_pos=value/2)]
 
 stat1_read <- ggplot(mstat1[variable %like% "reads"],aes(value, sample, fill=variable)) +
-geom_col(position = "dodge") +
+geom_col_interactive(position = "dodge", aes(tooltip=value)) +
 theme_bw() +
 theme(legend.position = "bottom") +
 xlab("# of reads") + ylab("") +
 scale_fill_manual(name="", values = c("firebrick","royalblue"), labels = c("mapped","unmapped"))
 
 stat1_inserts <- ggplot(mstat1[variable %like% "targeted inserts"],aes(value, sample, fill=variable)) +
-geom_col(position = "dodge") +
+geom_col_interactive(position = "dodge", aes(tooltip=value)) +
 geom_text(aes(x=perc_pos, label = paste0(perc, "%")), position = position_dodge(width = 1), hjust = -0.1) +
 theme_bw() +
 theme(legend.position = "bottom") +
@@ -79,20 +80,20 @@ scale_fill_manual(name="", values = c("firebrick","royalblue"), labels = c("targ
 
 ```
 
-* `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
+#### `mapped` (folder) - contains raw results of alignment of inserts to reference (`r snakemake@params$ref`) by [HS-BLASTN](https://github.com/chenying2016/queries/tree/master/hs-blastn-src) along with a summary table
   * [all_samples.stats.tsv](./mapped/all_samples.stats.tsv) (file) - summary table from alignment
   * `*.hsblastn.tsv` (file) - is a tabular result of alignment of particular sample's inserts to the reference
 
-```{r mapped-read, echo = FALSE, results = "asis"}
-ggplotly(stat1_read)
+```{r mapped-read, echo = FALSE, results = "asis", warning=FALSE,message=FALSE}
+girafe(ggobj=stat1_read)
 ```
 
-```{r mapped-inserts, echo = FALSE, results = "asis"}
-ggplotly(stat1_inserts)
+```{r mapped-inserts, echo = FALSE, results = "asis", warning=FALSE,message=FALSE}
+girafe(ggobj=stat1_inserts)
 ```
 
 <!--
-```{r echo = FALSE, results = "asis"}
+```{r mapped, echo = FALSE, results = "asis"}
 path = "mapped"
 for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
@@ -103,50 +104,117 @@ for (i in list.files(paste0(snakemake@params$wdir, path), "hsblastn.tsv", recurs
 ```{r stat2, echo = FALSE, results = "asis"}
 stat2 <- fread(paste0(snakemake@params$wdir, "counts/all_samples_report.tsv"))
 mstat2 <- melt(stat2,id.vars = c("sgRNA", "Gene"), variable.name = "sample")
-mstat3 <- mstat2[, value_gene:=sum(value), by=.(Gene,sample)]
-mstat3[, var_per_gene:=var(value_gene), by=.(Gene)] # get the variance per gene
-setorder(mstat3, -var_per_gene,Gene, sample)
+mstat2[, value_per_gene:=sum(value), by=.(Gene,sample)]
+mstat2[, var_per_gene:=var(value_per_gene), by=.(Gene)] # get the variance per gene
 
+# top 10 genes with highest variance
+setorder(mstat2, -var_per_gene,Gene, sample)
+top10_var_genes <- head(unique(mstat2[!Gene %like% "Control",]$Gene),10)
+
+# top 10 genes with highest sum of counts
+setorder(mstat2, -value_per_gene,Gene, sample)
 top10_genes <- head(unique(mstat2[!Gene %like% "Control",]$Gene),10)
-stat2_top10 <- stat2[Gene %in% top10_genes]
+
+# extract top 10 genes from mstat2 displaying Gene, sample, value_per_gene using dcast
+top10_genes_counts <- dcast(unique(mstat2[Gene %in% top10_genes, .(Gene, sample, value_per_gene)]),
+                         Gene ~ sample, value.var = "value_per_gene")
+
+top10_genes_var <- dcast(unique(mstat2[Gene %in% top10_var_genes, .(Gene, sample, value_per_gene)]),
+                         Gene ~ sample, value.var = "value_per_gene")
+
+# plot the top 10 genes with highest variance
+top10_genes_var_plot <- ggplot(mstat2[Gene %in% top10_var_genes], aes(Gene, value_per_gene, fill=sample)) +
+    geom_col_interactive(position = "dodge", aes(tooltip=paste0(sample,"\n",value_per_gene))) +
+    theme_bw() +
+    theme(legend.position = "bottom") +
+    scale_fill_manual(name="", values = c(brewer.pal(8,"Dark2"),brewer.pal(8,"Set2"),brewer.pal(8,"Pastel2"))) +
+    # rotate x-axis labels
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    # add title and axis labels
+    ggtitle("Top 10 genes with highest variance") +
+    xlab("Gene") + ylab("Sum of counts")
+
+# plot the top 10 genes with highest sum of counts
+top10_genes_plot <- ggplot(mstat2[Gene %in% top10_genes], aes(Gene, value_per_gene, fill=sample)) +
+    geom_col_interactive(position = "dodge", aes(tooltip=paste0(sample,"\n",value_per_gene))) +
+    theme_bw() +
+    theme(legend.position = "bottom") +
+    scale_fill_manual(name="", values = c(brewer.pal(8,"Dark2"),brewer.pal(8,"Set2"),brewer.pal(8,"Pastel2"))) +
+    # rotate x-axis labels
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    # add title and axis labels
+    ggtitle("Top 10 genes with highest sum of counts") +
+    xlab("Gene") + ylab("Sum of counts")
 ```
 
 
-* `counts` (folder) - contains results with inserts counts.
+#### `counts` (folder) - contains results with inserts counts.
   * [all_samples_report.tsv](./counts/all_samples_report.tsv) (file) - raw counts for sample data against reference guide sequences
   * [all_samples_report.pdf](./counts/all_samples_report.pdf) (file) - report summarising alignment data with various statistics
   * `*_graphs.pdf` (file) - shows inserts histograms:
-```{r echo = FALSE, results = "asis"}
+```{r counts, echo = FALSE, results = "asis"}
 path <- "counts"
 for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
   cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
 }
 ```
 
-* `DE_results` (folder) - contains results of differential expression
-  * `edgeR` (folder) - contains results processed by [edgeR tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+```{r top10_genes_var_plot, echo = FALSE, results = "asis", warning=FALSE,message=FALSE}
+# plot the top 10 genes with highest variance using ggiraph
+girafe(ggobj=top10_genes_var_plot)
+```
+
+```{r top10_genes_plot, echo = FALSE, results = "asis", warning=FALSE,message=FALSE}
+girafe(ggobj=top10_genes_plot)
+```
+
+#### `DE_results` (folder) - contains results of differential expression
+
+##### `edgeR` (folder) - contains results processed by [edgeR tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
     * `*.gene_summary.tsv` (file) - result of DE on gene level:
-```{r echo = FALSE, results = "asis"}
-path <- "DE_results/edgeR"
-for (i in list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)){
-  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
-}
-```
     * `*.sgrna_summary.tsv` (file) - result of DE on sgRNA level:
-```{r echo = FALSE, results = "asis"}
-path <- "DE_results/edgeR"
-for (i in list.files(paste0(snakemake@params$wdir, path), "sgrna_summary.tsv", recursive=T)){
-  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
-}
-```
     * `*.graphs.pdf` (file) - summary results with plots for TOP `r snakemake@params$top` genes:
-```{r echo = FALSE, results = "asis"}
+```{r edger, echo=FALSE, out.width="80%", results="asis", dev="svg"}
 path <- "DE_results/edgeR"
-for (i in list.files(paste0(snakemake@params$wdir, path), "graphs.pdf", recursive=T)){
-  cat(sprintf("\t* [%s](%s/%s)\n", basename(i), path, i))
+comparison <- list.files(paste0(snakemake@params$wdir, path), "gene_summary.tsv", recursive=T)
+volcano.plots<-function(comparison=comparison){
+  for(i in 1:length(comparison)){
+    comp_name <- gsub(".gene_summary.tsv", "", basename(comparison[i]))
+
+    output<-cat("###### ",comp_name," {.tabset}","\n")
+    output<-c(output,cat(sprintf("\t* [%s](%s/%s)\n", basename(comparison[i]), path, comparison[i])))
+    output<-c(output,cat(sprintf("\t* [%s](%s/%s)\n",
+                            basename(comparison[i]), path, gsub("gene_summary.tsv", "sgrna_summary.tsv", comparison[i]))))
+    output<-c(output,cat(sprintf("\t* [%s](%s/%s)\n",
+                            basename(comparison[i]), path, gsub("gene_summary.tsv", "graphs.pdf", comparison[i]))))
+
+    dt <- fread(paste0(path,"/",gsub("gene_summary.tsv", "sgrna_summary.tsv", comparison[i])))
+    dt[, DE:=ifelse(is.na(FDR), "NA",
+                    ifelse(FDR < 0.05 & logFC >= 1, "up-regulated",
+                    ifelse(FDR < 0.05 & logFC <= -1, "down-regulated",
+                    ifelse(FDR < 0.05 & logFC > -1 & logFC < 1, "significant", "not significant"))))]
+    dt[, DE:=factor(DE, levels=c("up-regulated", "down-regulated", "significant", "not significant", "NA"))]
+    volcano <- ggplot(dt, aes(logFC, -log10(FDR), color=DE)) +
+      geom_point_interactive(aes(tooltip=ID)) + theme_bw() +
+      xlab("log2 fold change") + ylab("-log10 FDR") +
+      scale_color_manual(name="", values=c("red", "blue", "purple", "grey", "black")) +
+      geom_hline(yintercept = -log10(0.05), linetype="dashed") +
+      geom_vline(xintercept = c(-1, 1), linetype="dashed") +
+      ggtitle(paste0("Volcano plot - ", comp_name))
+    output<-c(output,print(girafe(ggobj=volcano)))
+    output<-c(output,cat("\n\n"))
+    }
+  return(output)
 }
+
+no_null<-volcano.plots(comparison)
+
 ```
-  * `MAGeCK` (folder) - contains results processed by [MAGeCK tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html) tool
+
+##### {-}
+
+
+##### `MAGeCK` (folder) - contains results processed by [MAGeCK tool](https://bioconductor.org/packages/release/bioc/html/edgeR.html) tool
     * `*.gene_summary.txt` (file) - result of DE on gene level:
 ```{r echo = FALSE, results = "asis"}
 path <- "DE_results/MAGeCK"
